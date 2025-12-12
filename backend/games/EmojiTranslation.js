@@ -39,14 +39,12 @@ this.challenges = [
   { emoji: '⚰️2️⃣🙋', answer: 'Dead to Me', alternatives: [] },
   { emoji: '👻⛰️🏠', answer: 'The Haunting of Hill House', alternatives: ['hill house'] },
   { emoji: '👑♟️👩‍🦰', answer: 'The Queen\'s Gambit', alternatives: ['queens gambit'] },
-  { emoji: '🇮🇪🚸👯', answer: 'Derry Girls', alternatives: [] },
   { emoji: '🍆🍑💦👩‍🏫', answer: 'Sex Education', alternatives: [] },
   { emoji: '🥵❤️🏝️💸', answer: 'Too Hot To Handle', alternatives: [] },
   { emoji: '👇🔛⛪', answer: 'Downton Abbey', alternatives: [] },
   { emoji: '🎲🏰🪑⚔️', answer: 'Game of Thrones', alternatives: ['got'] },
   { emoji: '💬📱👧', answer: 'Gossip Girl', alternatives: [] },
   { emoji: '🛁👑🔔💨', answer: 'The Fresh Prince of Bel-Air', alternatives: ['fresh prince'] },
-  { emoji: '📞👶', answer: 'Call the Midwife', alternatives: [] },
   { emoji: '👩🏻👗📱🇫🇷', answer: 'Emily in Paris', alternatives: [] },
 
   // Disney
