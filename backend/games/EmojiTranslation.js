@@ -9,22 +9,64 @@ class EmojiTranslation extends BaseMiniGame {
     super(
       'emoji_translation',
       'Emoji Translation',
-      'Interpret the meaning behind emojis. Can you decode the message?'
+      'Interpret the movie or TV show behind emojis. Can you decode the message?'
     );
     
     // Predefined emoji challenges
-    this.challenges = [
-      { emoji: '😭🎉', answer: 'crying tears of joy', alternatives: ['happy crying', 'emotional celebration', 'tears of happiness'] },
-      { emoji: '🔥💯', answer: 'on fire', alternatives: ['lit', 'amazing', 'perfect'] },
-      { emoji: '🤔💭', answer: 'deep in thought', alternatives: ['thinking', 'contemplating', 'pondering'] },
-      { emoji: '❤️🔥', answer: 'passionate love', alternatives: ['burning love', 'intense love', 'hot love'] },
-      { emoji: '😎🌴', answer: 'chill vibes', alternatives: ['relaxed', 'vacation mode', 'cool and relaxed'] },
-      { emoji: '🎭🎪', answer: 'theatrical performance', alternatives: ['circus', 'drama', 'show'] },
-      { emoji: '⚡💪', answer: 'powerful energy', alternatives: ['strength', 'electric power', 'energetic'] },
-      { emoji: '🌙✨', answer: 'magical night', alternatives: ['starry night', 'night magic', 'celestial'] },
-      { emoji: '🍕❤️', answer: 'love for pizza', alternatives: ['pizza lover', 'pizza heart', 'pizza love'] },
-      { emoji: '🎯🏆', answer: 'achieving goals', alternatives: ['target achieved', 'winning', 'success'] }
-    ];
+this.challenges = [
+
+  // Movies
+  { emoji: '🍴🙏❤️', answer: 'Eat Pray Love', alternatives: [] },
+  { emoji: '5️⃣0️⃣0️⃣☀️❤️', answer: '500 Days of Summer', alternatives: [] },
+  { emoji: '😈 👠', answer: 'The Devil Wears Prada', alternatives: ['devil wears prada'] },
+  { emoji: '🚆👀', answer: 'Trainspotting', alternatives: [] },
+  { emoji: '👨✂️👐', answer: 'Edward Scissorhands', alternatives: [] },
+  { emoji: '🥊 ♣️', answer: 'Fight Club', alternatives: [] },
+  { emoji: '🏰👭❄️☃️', answer: 'Frozen', alternatives: [] },
+  { emoji: '👰👭💩', answer: 'Bridesmaids', alternatives: [] },
+  { emoji: '🔎🐟', answer: 'Finding Nemo', alternatives: [] },
+  { emoji: '👨⚡', answer: 'Harry Potter', alternatives: [] },
+  { emoji: '🏝️🏐', answer: 'Castaway', alternatives: ['cast away'] },
+  { emoji: '👽📞🏠', answer: 'E.T.', alternatives: ['et'] },
+  { emoji: '🧙‍♂️🧝‍♀️💍🌋', answer: 'The Lord of the Rings', alternatives: ['lotr'] },
+  { emoji: '🐺🏦', answer: 'The Wolf of Wall Street', alternatives: ['wolf of wall street'] },
+  { emoji: '🎵🇫🇷😔', answer: 'Les Miserables', alternatives: ['les mis', 'les misérables'] },
+
+  // TV Shows
+  { emoji: '🇬🇧🍰', answer: 'The Great British Bake Off', alternatives: ['bake off'] },
+  { emoji: '🦑🎮', answer: 'Squid Game', alternatives: [] },
+  { emoji: '💰🇪🇸', answer: 'Money Heist', alternatives: ['la casa de papel'] },
+  { emoji: '⚰️2️⃣🙋', answer: 'Dead to Me', alternatives: [] },
+  { emoji: '👻⛰️🏠', answer: 'The Haunting of Hill House', alternatives: ['hill house'] },
+  { emoji: '👑♟️👩‍🦰', answer: 'The Queen\'s Gambit', alternatives: ['queens gambit'] },
+  { emoji: '🇮🇪🚸👯', answer: 'Derry Girls', alternatives: [] },
+  { emoji: '🍆🍑💦👩‍🏫', answer: 'Sex Education', alternatives: [] },
+  { emoji: '🥵❤️🏝️💸', answer: 'Too Hot To Handle', alternatives: [] },
+  { emoji: '👇🔛⛪', answer: 'Downton Abbey', alternatives: [] },
+  { emoji: '🎲🏰🪑⚔️', answer: 'Game of Thrones', alternatives: ['got'] },
+  { emoji: '💬📱👧', answer: 'Gossip Girl', alternatives: [] },
+  { emoji: '🛁👑🔔💨', answer: 'The Fresh Prince of Bel-Air', alternatives: ['fresh prince'] },
+  { emoji: '📞👶', answer: 'Call the Midwife', alternatives: [] },
+  { emoji: '👩🏻👗📱🇫🇷', answer: 'Emily in Paris', alternatives: [] },
+
+  // Disney
+  { emoji: '🐒🪔🧞‍♂️', answer: 'Aladdin', alternatives: [] },
+  { emoji: '🦁👑', answer: 'Lion King', alternatives: ['the lion king'] },
+  { emoji: '👑🐸', answer: 'The Princess and the Frog', alternatives: [] },
+  { emoji: '👶🧜🏽‍♀️', answer: 'The Little Mermaid', alternatives: ['little mermaid'] },
+  { emoji: '❄️☃️👩‍🦳', answer: 'Frozen', alternatives: [] },
+  { emoji: '🧸📖', answer: 'Toy Story', alternatives: [] },
+  { emoji: '👩🏻🐉🗡', answer: 'Mulan', alternatives: [] },
+  { emoji: '😴👸🏼', answer: 'Sleeping Beauty', alternatives: [] },
+  { emoji: '🔍🐟', answer: 'Finding Nemo', alternatives: [] },
+  { emoji: '👸🏻🌹👹', answer: 'Beauty and the Beast', alternatives: [] },
+  { emoji: '🐀👨‍🍳🍝', answer: 'Ratatouille', alternatives: [] },
+  { emoji: '😀😭😡😱🤢', answer: 'Inside Out', alternatives: [] },
+  { emoji: '🌻👑💇‍♀️', answer: 'Tangled', alternatives: [] },
+  { emoji: '🌺💙👽', answer: 'Lilo and Stitch', alternatives: ['lilo & stitch'] },
+  { emoji: '🏺⚡️💪', answer: 'Hercules', alternatives: [] }
+];
+
   }
 
   initialize() {

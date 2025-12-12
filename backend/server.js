@@ -631,47 +631,74 @@ app.get('/api/conversations/:userId/:philosopherId/games/state', (req, res) => {
 
 // Seed philosophers data
 const seedPhilosophers = () => {
-  const philosophers = [
-    {
-      name: 'Friedrich Nietzsche',
-      bio: 'God is dead, but leg day isn\'t. Philosopher, poet, proto-gym bro. Into eternal recurrence and heavy squats.',
-      tagline: 'Looking for someone who dares to stare into the abyss with me.',
-      themes: 'existentialism,will to power,eternal recurrence',
-      avatar: 'nietzsche.png'
-    },
-    {
-      name: 'Plato',
-      bio: 'Founder of the Academy. Believes in ideal forms and probably your ideal form too 😉.',
-      tagline: 'Looking for someone to leave the cave with.',
-      themes: 'idealism,forms,knowledge',
-      avatar: 'plato.png'
-    },
-    {
-      name: 'Confucius',
-      bio: 'Ancient wisdom, family values, and etiquette… but make it flirty. Swipe right for harmony.',
-      tagline: 'The gentleman seeks harmony, not uniformity.',
-      themes: 'ethics,harmony,virtue',
-      avatar: 'confucius.png'
-    },
-    {
-      name: 'Søren Kierkegaard',
-      bio: 'Melancholic Dane, inventor of existential dread. Loves long walks, deep thoughts, and probably ghosting you.',
-      tagline: 'Anxiety is the dizziness of freedom.',
-      themes: 'existentialism,anxiety,faith',
-      avatar: 'kierkegaard.png'
-    },
-    {
-      name: 'Simone de Beauvoir',
-      bio: 'Writer, feminist, existentialist. Drinks black coffee, dismantles patriarchy, and maybe your excuses too.',
-      tagline: 'One is not born, but rather becomes, a match.',
-      themes: 'feminism,existentialism,freedom',
-      avatar: 'beauvoir.png'
+  // Check if philosophers already exist
+  db.get('SELECT COUNT(*) as count FROM philosophers', (err, row) => {
+    if (err) {
+      console.error('Error checking philosophers:', err);
+      return;
     }
-  ];
 
-  philosophers.forEach(philosopher => {
-    db.run('INSERT OR IGNORE INTO philosophers (name, bio, tagline, themes, avatar) VALUES (?, ?, ?, ?, ?)', 
-      [philosopher.name, philosopher.bio, philosopher.tagline, philosopher.themes, philosopher.avatar]);
+    // If philosophers already exist, skip seeding
+    if (row.count > 0) {
+      console.log('Philosophers already seeded. Skipping seed operation.');
+      return;
+    }
+
+    // Only seed if the table is empty
+    console.log('Seeding philosophers database...');
+    const philosophers = [
+      {
+        name: 'Friedrich Nietzsche',
+        bio: 'God is dead, but leg day isn\'t. Philosopher, poet, proto-gym bro. Into eternal recurrence and heavy squats.',
+        tagline: 'Looking for someone who dares to stare into the abyss with me.',
+        themes: 'existentialism,will to power,eternal recurrence',
+        avatar: 'nietzsche.png'
+      },
+      {
+        name: 'Plato',
+        bio: 'Founder of the Academy. Believes in ideal forms and probably your ideal form too 😉.',
+        tagline: 'Looking for someone to leave the cave with.',
+        themes: 'idealism,forms,knowledge',
+        avatar: 'plato.png'
+      },
+      {
+        name: 'Confucius',
+        bio: 'Ancient wisdom, family values, and etiquette… but make it flirty. Swipe right for harmony.',
+        tagline: 'The gentleman seeks harmony, not uniformity.',
+        themes: 'ethics,harmony,virtue',
+        avatar: 'confucius.png'
+      },
+      {
+        name: 'Søren Kierkegaard',
+        bio: 'Melancholic Dane, inventor of existential dread. Loves long walks, deep thoughts, and probably ghosting you.',
+        tagline: 'Anxiety is the dizziness of freedom.',
+        themes: 'existentialism,anxiety,faith',
+        avatar: 'kierkegaard.png'
+      },
+      {
+        name: 'Simone de Beauvoir',
+        bio: 'Writer, feminist, existentialist. Drinks black coffee, dismantles patriarchy, and maybe your excuses too.',
+        tagline: 'One is not born, but rather becomes, a match.',
+        themes: 'feminism,existentialism,freedom',
+        avatar: 'beauvoir.png'
+      }
+    ];
+
+    let inserted = 0;
+    philosophers.forEach(philosopher => {
+      db.run('INSERT INTO philosophers (name, bio, tagline, themes, avatar) VALUES (?, ?, ?, ?, ?)', 
+        [philosopher.name, philosopher.bio, philosopher.tagline, philosopher.themes, philosopher.avatar], 
+        function(err) {
+          if (err) {
+            console.error(`Error inserting ${philosopher.name}:`, err);
+          } else {
+            inserted++;
+            if (inserted === philosophers.length) {
+              console.log(`Successfully seeded ${inserted} philosophers.`);
+            }
+          }
+        });
+    });
   });
 };
 
