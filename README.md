@@ -7,7 +7,7 @@ A full-stack Tinder-like dating app where users swipe, match, and chat with famo
 - **Swipe & Match**: Swipeable cards for philosopher profiles with humorous, modernized bios
 - **Chat System**: Interactive dialogue trees where philosophers guide users through self-reflection
 - **Retro UI**: 8-bit RPG styling with pixel fonts and playful animations
-- **5 Philosophers**: Nietzsche, Plato, Confucius, Kierkegaard, and Simone de Beauvoir
+- **Philosophers**: Nietzsche, Plato, Confucius, Kierkegaard, and Simone de Beauvoir
 
 ## Tech Stack
 
@@ -44,7 +44,7 @@ The app will run on `http://localhost:3000`
 2. **Swipe**: Swipe right on philosophers you want to match with
 3. **Match**: When you match, you'll see a celebration animation
 4. **Chat**: Enter the chat view to have philosophical conversations
-5. **Reflect**: Choose from dialogue options to explore your thoughts and feelings
+5. **Reflect**: Speak with the philospher explore your thoughts and feelings
 
 ## Philosophers & Their Wisdom
 

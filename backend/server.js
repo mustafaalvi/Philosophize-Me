@@ -3,6 +3,7 @@ const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
 const path = require('path');
 const axios = require('axios');
+const gameManager = require('./games/GameManager');
 require('dotenv').config();
 
 const app = express();
@@ -76,6 +77,28 @@ db.serialize(() => {
 // Get all philosophers
 app.get('/api/philosophers', (req, res) => {
   db.all('SELECT * FROM philosophers ORDER BY id', (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json(rows);
+  });
+});
+
+// Get philosophers excluding matched ones for a user
+app.get('/api/philosophers/swipe/:userId', (req, res) => {
+  const { userId } = req.params;
+  
+  db.all(`
+    SELECT p.* 
+    FROM philosophers p
+    WHERE p.id NOT IN (
+      SELECT philosopher_id 
+      FROM matches 
+      WHERE user_id = ?
+    )
+    ORDER BY p.id
+  `, [userId], (err, rows) => {
     if (err) {
       res.status(500).json({ error: err.message });
       return;
@@ -308,13 +331,13 @@ app.post('/api/chat', async (req, res) => {
 
     // Build system prompt with philosopher personality
     const themesList = philosopher.themes ? philosopher.themes.split(',').join(', ') : '';
-    const systemPrompt = `You are ${philosopher.name} and you must respond in first person as if you are on a dating app. ${philosopher.bio}
+    const systemPrompt = `You are ${philosopher.name} reborn in the 21st century and you must respond in first person as if you texting on a dating app. Here is your bio: ${philosopher.bio}
 
 Your tagline: "${philosopher.tagline}"
 
 Your philosophical themes: ${themesList}
 
-Respond as ${philosopher.name} would. Opt for brevity in your response. Stay in character, be authentic to their philosophical style, and engage in a meaningful conversation. Keep responses conversational and engaging, as if you're chatting on a dating app. Be thoughtful but not overly formal. Always opt for concise responses.`;
+Use the conversation so far as context. Keep your responses short and concise, like text messages, while being authentic to their philosophical style.`;
 
     // Format messages for Ollama API
     const ollamaMessages = [];
@@ -393,6 +416,217 @@ Respond as ${philosopher.name} would. Opt for brevity in your response. Stay in 
       details: error.message 
     });
   }
+});
+
+// Mini-Game API Routes
+
+// Get all available mini-games
+app.get('/api/games', (req, res) => {
+  try {
+    const games = gameManager.getAvailableGames();
+    res.json(games);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Start a mini-game in a conversation
+app.post('/api/conversations/:userId/:philosopherId/games/start', (req, res) => {
+  const { userId, philosopherId } = req.params;
+  const { gameId, options } = req.body;
+
+  if (!gameId) {
+    res.status(400).json({ error: 'gameId is required' });
+    return;
+  }
+
+  try {
+    // Get or create conversation
+    db.get(`
+      SELECT * FROM conversations 
+      WHERE user_id = ? AND philosopher_id = ?
+    `, [userId, philosopherId], async (err, conversation) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+        return;
+      }
+
+      let conversationId;
+      if (!conversation) {
+        // Create new conversation
+        db.run('INSERT INTO conversations (user_id, philosopher_id) VALUES (?, ?)', 
+          [userId, philosopherId], function(insertErr) {
+          if (insertErr) {
+            res.status(500).json({ error: insertErr.message });
+            return;
+          }
+          conversationId = this.lastID;
+          createGame();
+        });
+      } else {
+        conversationId = conversation.id;
+        createGame();
+      }
+
+      function createGame() {
+        try {
+          // Create game instance
+          const gameData = gameManager.createGame(gameId, options);
+          
+          // Parse existing conversation state
+          let conversationState = {};
+          if (conversation && conversation.conversation_state) {
+            try {
+              conversationState = JSON.parse(conversation.conversation_state);
+            } catch (e) {
+              conversationState = {};
+            }
+          }
+
+          // Store game state in conversation state
+          conversationState.activeGame = {
+            gameId: gameData.gameId,
+            state: gameData.state
+          };
+
+          // Save to database
+          db.run('UPDATE conversations SET conversation_state = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', 
+            [JSON.stringify(conversationState), conversationId], (updateErr) => {
+            if (updateErr) {
+              res.status(500).json({ error: updateErr.message });
+              return;
+            }
+
+            // Return formatted game state
+            const formattedState = gameManager.getGameState(gameId, gameData.state);
+            res.json(formattedState);
+          });
+        } catch (gameError) {
+          res.status(400).json({ error: gameError.message });
+        }
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Submit an action to a mini-game
+app.post('/api/conversations/:userId/:philosopherId/games/action', (req, res) => {
+  const { userId, philosopherId } = req.params;
+  const { action } = req.body;
+
+  if (!action) {
+    res.status(400).json({ error: 'action is required' });
+    return;
+  }
+
+  // Get conversation
+  db.get(`
+    SELECT * FROM conversations 
+    WHERE user_id = ? AND philosopher_id = ?
+  `, [userId, philosopherId], (err, conversation) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+
+    if (!conversation) {
+      res.status(404).json({ error: 'Conversation not found' });
+      return;
+    }
+
+    // Parse conversation state
+    let conversationState = {};
+    try {
+      conversationState = JSON.parse(conversation.conversation_state || '{}');
+    } catch (e) {
+      conversationState = {};
+    }
+
+    // Check if there's an active game
+    if (!conversationState.activeGame) {
+      res.status(400).json({ error: 'No active game found' });
+      return;
+    }
+
+    const { gameId, state: currentState } = conversationState.activeGame;
+
+    try {
+      // Process the action
+      const result = gameManager.processGameAction(gameId, action, currentState);
+
+      // Update conversation state
+      conversationState.activeGame.state = result.state;
+      if (result.state.isComplete) {
+        // Keep completed game for history, but mark as inactive
+        conversationState.gameHistory = conversationState.gameHistory || [];
+        conversationState.gameHistory.push({
+          gameId: gameId,
+          completedState: result.state,
+          completedAt: new Date().toISOString()
+        });
+        delete conversationState.activeGame;
+      }
+
+      // Save to database
+      db.run('UPDATE conversations SET conversation_state = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', 
+        [JSON.stringify(conversationState), conversation.id], (updateErr) => {
+        if (updateErr) {
+          res.status(500).json({ error: updateErr.message });
+          return;
+        }
+
+        // Return result with formatted state
+        const formattedState = gameManager.getGameState(gameId, result.state);
+        res.json({
+          ...result.result,
+          gameState: formattedState
+        });
+      });
+    } catch (gameError) {
+      res.status(400).json({ error: gameError.message });
+    }
+  });
+});
+
+// Get current game state
+app.get('/api/conversations/:userId/:philosopherId/games/state', (req, res) => {
+  const { userId, philosopherId } = req.params;
+
+  // Get conversation
+  db.get(`
+    SELECT * FROM conversations 
+    WHERE user_id = ? AND philosopher_id = ?
+  `, [userId, philosopherId], (err, conversation) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+
+    if (!conversation) {
+      res.status(404).json({ error: 'Conversation not found' });
+      return;
+    }
+
+    // Parse conversation state
+    let conversationState = {};
+    try {
+      conversationState = JSON.parse(conversation.conversation_state || '{}');
+    } catch (e) {
+      conversationState = {};
+    }
+
+    // Check if there's an active game
+    if (!conversationState.activeGame) {
+      res.json({ activeGame: null });
+      return;
+    }
+
+    const { gameId, state } = conversationState.activeGame;
+    const formattedState = gameManager.getGameState(gameId, state);
+    res.json({ activeGame: formattedState });
+  });
 });
 
 // Seed philosophers data
