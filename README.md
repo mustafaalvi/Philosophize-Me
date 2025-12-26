@@ -1,4 +1,4 @@
-# 🧠 Philosopher Dating App (POC video available for download in repo)
+# 🧠 Philosopher Dating App - POC video in repository 
 
 A full-stack Tinder-like dating app where users swipe, match, and chat with famous philosophers from history. Features a unique blend of modern dating UX with 8-bit RPG aesthetics and philosophical dialogue trees.
 
@@ -27,6 +27,9 @@ npm start
 ```
 
 The server will run on `http://localhost:5000`
+
+**In addition, this app leverages a local Ollama model to complete it's requests! 
+So you will need to have an instance of that running on localhost:11434 (the default Ollama port) **
 
 ### Frontend Setup
 
