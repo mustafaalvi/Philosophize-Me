@@ -1,7 +1,6 @@
 # 🧠 Philosopher Dating App - POC video in repository 
 
-A full-stack Tinder-like dating app where users swipe, match, and chat with famous philosophers from history. Features a unique blend of modern dating UX with 8-bit RPG aesthetics and philosophical dialogue trees.
-
+A full-stack Tinder-like dating app where users swipe, match, and chat with famous philosophers from history in a modern dating UX. 
 ## Features
 
 - **Swipe & Match**: Swipeable cards for philosopher profiles with humorous, modernized bios
